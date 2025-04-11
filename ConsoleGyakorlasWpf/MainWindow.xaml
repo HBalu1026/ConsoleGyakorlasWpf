@@ -45,9 +45,8 @@
                     Content="Delete" 
                     Click="btnDelete_Click" 
                     Margin="5"/>
-            <ComboBox x:Name="cbDelete" 
-                      Margin="5"
-                      SelectionChanged="cbDelete_SelectionChanged"/>
+            <ComboBox x:Name="cbFilter" 
+                      Margin="5"/>
         </StackPanel>
     </Grid>
 </Window>

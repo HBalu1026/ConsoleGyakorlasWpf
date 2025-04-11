@@ -18,18 +18,27 @@ namespace ConsoleGyakorlasWpf;
 /// </summary>
 public partial class MainWindow : Window
 {
+    List<DataItem> dataList = [];
     public MainWindow()
     {
         InitializeComponent();
 
-        cbDelete.Items.Add("öszes");
-        cbDelete.Items.Add("belépés");
-        cbDelete.Items.Add("kilépés");
-        cbDelete.Items.Add("menza");
-        cbDelete.Items.Add("könyvtár");
+        cbFilter.Items.Add("öszes");
+        cbFilter.Items.Add("belépés");
+        cbFilter.Items.Add("kilépés");
+        cbFilter.Items.Add("menza");
+        cbFilter.Items.Add("könyvtár");
 
-        cbDelete.SelectedIndex = 0;
-        var originalData = dgTabla.ItemsSource as IEnumerable<DataItem>;
+        cbFilter.SelectedIndex = 0;
+
+        dataList = new List<DataItem>();
+
+        cbFilter.SelectionChanged += (s, e) => 
+        {
+            if (cbFilter.SelectedItem.ToString() == "öszes")
+                dgTabla.ItemsSource = dataList;
+            else dgTabla.ItemsSource = dataList.Where(x => x.Fajta == cbFilter.SelectedItem.ToString());
+        };
     }
 
     private void btnLoad_Click(object sender, RoutedEventArgs e)
@@ -45,7 +54,7 @@ public partial class MainWindow : Window
             try
             {
                 var lines = File.ReadAllLines(openFileDialog.FileName);
-                var dataList = new List<DataItem>();
+                //var dataList = new List<DataItem>();
 
                 foreach (var line in lines)
                 {
@@ -146,27 +155,20 @@ public partial class MainWindow : Window
 
     private void btnDelete_Click(object sender, RoutedEventArgs e)
     {
-
-    }
-
-    private void cbDelete_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (cbDelete.SelectedItem is string selectedFajta)
+        var selectedItem = dgTabla.SelectedItem as DataItem;
+        if (selectedItem != null)
         {
-            
-
-            if (originalData != null)
+            var dataItems = dgTabla.ItemsSource as List<DataItem>;
+            if (dataItems != null)
             {
-                if (selectedFajta == "All")
-                {
-                    dgTabla.ItemsSource = originalData.ToList();
-                }
-                else
-                {
-                    var filteredData = originalData.Where(item => item.Fajta == selectedFajta).ToList();
-                    dgTabla.ItemsSource = filteredData;
-                }
+                dataItems.Remove(selectedItem);
+                dgTabla.ItemsSource = null;
+                dgTabla.ItemsSource = dataItems;
             }
+        }
+        else
+        {
+            MessageBox.Show("Nincs kijelölt sor.", "Figyelem", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }
